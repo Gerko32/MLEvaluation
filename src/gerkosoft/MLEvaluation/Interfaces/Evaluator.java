@@ -12,13 +12,13 @@ import gerkosoft.MLEvaluation.Instance.ConfusionMatrix;
  * @param <TInstance> Type of the instances in the dataset
  * @param <TLabel> Type of the label
  */
-public interface Evaluator<TLearner extends Learner<TInstance, TLabel>, TInstance extends Instance<TLabel>, TLabel> {
+public interface Evaluator<TInstance extends Instance<TLabel>, TLabel> {
 	/***
 	 * It a k-fold validation and it returns its ConfusionMatrix
-	 * @param learnerFactory a Functor that createsa new instance of a learner every time.
+	 * @param learnerFactory a Functor that creates a new instance of a learner every time.
 	 * @param dataset list of labeled instances
 	 * @param quantityOfFolds quantity of folds
 	 * @return ConfusionMatrix over all folds.
 	 */
-	ConfusionMatrix<TInstance, TLabel> evaluate(Factory<TLearner> learnerFactory, Collection<TInstance> dataset, int quantityOfFolds);
+	ConfusionMatrix<TInstance, TLabel> evaluate(Factory<Learner<TInstance, TLabel>> learnerFactory, Collection<TInstance> dataset, int quantityOfFolds);
 }

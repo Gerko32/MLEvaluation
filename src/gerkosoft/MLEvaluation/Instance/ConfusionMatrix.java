@@ -36,15 +36,15 @@ public class ConfusionMatrix<TInstance extends Instance<TLabel>, TLabel>{
 			labels.addAll(secondLayer.keySet());
 		}
 		//headers
-		for(TLabel label : labels){
+		for(TLabel predictedLabel : labels){
 			builder.append('\t');
-			builder.append(label);
+			builder.append(predictedLabel);
 		}
 		//table
-		for(TLabel predictedLabel : labels){
+		for(TLabel actualLabel : labels){
 			builder.append('\n');
-			builder.append(predictedLabel);
-			for(TLabel actualLabel : labels){
+			builder.append(actualLabel);
+			for(TLabel predictedLabel : labels){
 				builder.append('\t');
 				builder.append(GetValue(actualLabel,predictedLabel));
 			}
