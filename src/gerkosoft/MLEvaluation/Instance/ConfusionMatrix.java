@@ -7,43 +7,30 @@ import java.util.Set;
 
 import gerkosoft.MLEvaluation.Interfaces.Instance;
 
-public class ConfusionMatrix<TInstance extends Instance<TLabel>, TLabel> {
-	private Map<TLabel, Map<TLabel, Integer>> matrix;
+public class ConfusionMatrix<TLabel> {
+	private final Map<LabelPairCombination<TLabel>, Integer> matrix;
 
 	public ConfusionMatrix() {
-		this.matrix = new HashMap<TLabel, Map<TLabel, Integer>>();
+		this.matrix = new HashMap<LabelPairCombination<TLabel>, Integer>();
 	}
-
-	public void addToMatrix(TInstance instance, TLabel predictedLabel) {
-		addToMatrix(instance.getLabel(), predictedLabel);
+	protected ConfusionMatrix(ConfusionMatrix<TLabel>.ConfusionMatrixBuilder builder) {
+		this.matrix = new HashMap<LabelPairCombination<TLabel>, Integer>(builder.matrix);
 	}
-
-	public void addToMatrix(TLabel actualLabel, TLabel predictedLabel) {
-		if (!this.matrix.containsKey(actualLabel)) {
-			this.matrix.put(actualLabel, new HashMap<TLabel, Integer>());
-		}
-		if (!this.matrix.get(actualLabel).containsKey(predictedLabel)) {
-			this.matrix.get(actualLabel).put(predictedLabel, 0);
-		}
-		this.matrix.get(actualLabel).put(predictedLabel, this.matrix.get(actualLabel).get(predictedLabel) + 1);
-	}
-
-	public int getValue(TLabel actualLabel, TLabel predictedLabel) {
-		if (!this.matrix.containsKey(actualLabel)) {
+	public int getValue(TLabel gold, TLabel predicted) {
+		LabelPairCombination<TLabel> key=new LabelPairCombination<TLabel>(gold, predicted);
+		if (!this.matrix.containsKey(key)) {
 			return 0;
 		}
-		if (!this.matrix.get(actualLabel).containsKey(predictedLabel)) {
-			return 0;
-		}
-		return this.matrix.get(actualLabel).get(predictedLabel);
+		return this.matrix.get(key);
 	}
 
 	@Override
 	public String toString() {
-		Set<TLabel> labels = new HashSet<TLabel>(this.matrix.keySet());
+		Set<TLabel> labels = new HashSet<TLabel>();
 		StringBuilder builder = new StringBuilder();
-		for (Map<TLabel, Integer> secondLayer : this.matrix.values()) {
-			labels.addAll(secondLayer.keySet());
+		for (LabelPairCombination<TLabel> labelPair : this.matrix.keySet()) {
+			labels.add(labelPair.getGoldLabel());
+			labels.add(labelPair.getPredictedLabel());
 		}
 		// headers
 		for (TLabel predictedLabel : labels) {
@@ -60,5 +47,27 @@ public class ConfusionMatrix<TInstance extends Instance<TLabel>, TLabel> {
 			}
 		}
 		return builder.toString();
+	}
+	public class ConfusionMatrixBuilder {
+		protected Map<LabelPairCombination<TLabel>, Integer> matrix;
+
+		public ConfusionMatrixBuilder() {
+			this.matrix = new HashMap<LabelPairCombination<TLabel>, Integer>();
+		}
+
+		public <TInstance extends Instance<TLabel>> void addToMatrix(TInstance instance, TLabel predictedLabel) {
+			addToMatrix(instance.getLabel(), predictedLabel);
+		}
+		
+		public void addToMatrix(TLabel gold, TLabel predicted) {
+			LabelPairCombination<TLabel> key=new LabelPairCombination<TLabel>(gold, predicted);
+			if (!this.matrix.containsKey(key)) {
+				this.matrix.put(key, 0);
+			}
+			this.matrix.put(key, this.matrix.get(key) + 1);
+		}
+		public ConfusionMatrix<TLabel> build(){
+			return new ConfusionMatrix<TLabel>(this);
+		}
 	}
 }

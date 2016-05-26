@@ -28,6 +28,6 @@ public interface Evaluator<TInstance extends Instance<TLabel>, TLabel> {
 	 *            quantity of folds
 	 * @return ConfusionMatrix over all folds.
 	 */
-	ConfusionMatrix<TInstance, TLabel> evaluate(Factory<Learner<TInstance, TLabel>> learnerFactory,
+	ConfusionMatrix<TLabel> evaluate(Factory<Learner<TInstance, TLabel>> learnerFactory,
 			Collection<TInstance> dataset, int quantityOfFolds);
 }

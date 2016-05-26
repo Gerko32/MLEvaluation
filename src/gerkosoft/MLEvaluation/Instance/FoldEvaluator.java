@@ -18,19 +18,19 @@ public class FoldEvaluator<TInstance extends Instance<TLabel>, TLabel> implement
 	}
 
 	@Override
-	public ConfusionMatrix<TInstance, TLabel> evaluate(Factory<Learner<TInstance, TLabel>> learnerFactory,
+	public ConfusionMatrix<TLabel> evaluate(Factory<Learner<TInstance, TLabel>> learnerFactory,
 			Collection<TInstance> dataset, int quantityOfFolds) {
 		List<List<TInstance>> folds = this.distributor.distribute(dataset, quantityOfFolds);
-		ConfusionMatrix<TInstance, TLabel> confusionMatrix = new ConfusionMatrix<TInstance, TLabel>();
+		ConfusionMatrix<TLabel>.ConfusionMatrixBuilder confusionMatrix = (new ConfusionMatrix<TLabel>()).new  ConfusionMatrixBuilder();
 		for (int i = 0; i < folds.size(); i++) {
 			confusionMatrix = evaluateFold(learnerFactory, folds, i, confusionMatrix);
 		}
-		return confusionMatrix;
+		return confusionMatrix.build();
 	}
 
-	private ConfusionMatrix<TInstance, TLabel> evaluateFold(Factory<Learner<TInstance, TLabel>> learnerFactory,
+	private ConfusionMatrix<TLabel>.ConfusionMatrixBuilder evaluateFold(Factory<Learner<TInstance, TLabel>> learnerFactory,
 			List<List<TInstance>> folds, int selectedTestingFoldIndex,
-			ConfusionMatrix<TInstance, TLabel> confusionMatrix) {
+			ConfusionMatrix<TLabel>.ConfusionMatrixBuilder confusionMatrix) {
 		List<TInstance> trainingData = new ArrayList<TInstance>();
 		List<TInstance> testingData = new ArrayList<TInstance>();
 		Learner<TInstance, TLabel> learner = learnerFactory.generateNewInstance();
